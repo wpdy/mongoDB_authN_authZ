@@ -1,9 +1,9 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const adSchema = mongoose.Schema(
     {
         user: {
-            type: mongoose.Schema.Types.ObjectId,
+            type: mongoose.Types.ObjectId,
             required: true,
             ref: 'User'
         },
@@ -16,13 +16,13 @@ const adSchema = mongoose.Schema(
             required: [true, 'Please add a description']
         },
         price: {
-            type: String,
+            type: String, 
             required: [true, 'Please add a price Eur']
         }
     },
     {
         timestamps: true
-    }
+   }
 )
 
 module.exports = mongoose.model('Ad', adSchema)

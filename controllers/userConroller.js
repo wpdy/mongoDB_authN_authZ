@@ -1,7 +1,7 @@
+const User = require('../models/userModel');
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const asyncHandler = require('express-async-handler')
-const User = require('../models/userModel')
 
 // @desc Register new user
 // @route POST /api/users
@@ -43,13 +43,6 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 })
 
-
-
-
-
-
-
-
 // @desc Login a user
 // @route POST /api/users/login
 // @access PUBLIC
@@ -72,55 +65,56 @@ const loginUser = asyncHandler(async (req, res) => {
     }
   })
   
-  // @desc Get user data
-  // @route GET /api/users/user
-  // @access PRIVATE
-  const getUser = asyncHandler(async (req, res) => {
-    res.status(200).json(req.user)
-  })
-  
-  // @desc Get users data
-  // @route GET /api/users/list
-  // @access PRIVATE
-  const getUsers = asyncHandler(async (req, res) => {
-    const users = await User.aggregate([
-      {
-        $lookup: {
-          from: "goals",
-          localField: "_id",
-          foreignField: "user",
-          as: "goals"
-        }
-      },
-      {
-        $match: { role: 'simple' }
-      },
-      {
-        $unset: [
-          "password",
-          "createdAt",
-          "updatedAt",
-          "gaols.createdAt",
-          "goals.updatedAt",
-          "goals.__v",
-          "__v"
-        ]
+// @desc Get user data
+// @route GET /api/users/user
+// @access PRIVATE
+const getUser = asyncHandler(async (req, res) => {
+  res.status(200).json(req.user)
+})
+
+// @desc Get users data
+// @route GET /api/users/list
+// @access PRIVATE
+const getUsers = asyncHandler(async (req, res) => {
+  const users = await User.aggregate([
+    {
+      $lookup: {
+        from: "ads",
+        localField: "_id",
+        foreignField: "user",
+        as: "ads"
       }
-    ])
-  
-    res.status(200).json(users)
-  })
-  
-  // Generate JWT
-  const generateToken = id => {
+    },
+    {
+      $match: { role: 'simple' }
+    },
+    {
+      $unset: [
+        "password",
+        "createdAt",
+        "updatedAt",
+        "ads.createdAt",
+        "ads.updatedAt",
+        "ads.__v",
+        "__v"
+      ]
+    }
+  ])
+
+  res.status(200).json(users)
+})
+
+
+// Generate JWT
+const generateToken = id => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
       expiresIn: '30d'
     })
   }
-  
-  module.exports = {
+
+module.exports = {
     registerUser,
     loginUser,
     getUser,
     getUsers
-  }
+}
